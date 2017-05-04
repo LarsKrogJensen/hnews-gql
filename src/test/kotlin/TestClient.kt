@@ -13,7 +13,7 @@ fun main(args: Array<String>) {
             r.forEach {
                 println("Id: " + it)
             }
-           api.story(r[0]).whenComplete{r2, t2 ->
+           api.story(r[0]).whenComplete{ r2, _ ->
                println("r2: " + r2)
             }
         }

@@ -12,7 +12,6 @@ import io.vertx.core.cli.Option
 import io.vertx.core.json.JsonObject
 import io.vertx.kotlin.config.ConfigRetrieverOptions
 import io.vertx.kotlin.config.ConfigStoreOptions
-import se.lars.BootstrapModule
 import se.lars.guice.GuiceVerticleFactory
 import se.lars.guice.GuiceVertxDeploymentManager
 import se.lars.guice.VertxModule

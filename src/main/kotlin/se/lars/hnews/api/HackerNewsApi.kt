@@ -9,7 +9,9 @@ import io.vertx.core.Vertx
 import io.vertx.core.http.HttpClient
 import io.vertx.core.http.HttpClientOptions
 import io.vertx.core.http.HttpVersion
+import se.lars.hnews.types.Comment
 import se.lars.hnews.types.Story
+import se.lars.hnews.types.User
 import se.lars.kutil.loggerFor
 import java.util.concurrent.CompletableFuture
 import javax.inject.Inject
@@ -48,11 +50,23 @@ class HackerNewsApi
     }
 
     override fun topStories(): CompletableFuture<List<Int>> {
-        return invokeQuery("/v0/topstories.json")
+        return invokeQuery<List<Int>>("/v0/topstories.json")
     }
 
     override fun story(id: Int): CompletableFuture<Story> {
         return invokeQuery("/v0/item/$id.json")
+    }
+
+    override fun comment(id: Int): CompletableFuture<Comment> {
+        return invokeQuery("/v0/item/$id.json")
+    }
+
+    //    override fun comments(comments: List<Int>): CompletableFuture<List<Comment>> {
+//        return comments.map { invokeQuery<Comment>("/v0/item/$it.json") }.awaitAll()
+//    }
+
+    override fun user(id: String): CompletableFuture<User> {
+        return invokeQuery("/v0/user/$id.json")
     }
 
     inline private fun <reified T:Any> invokeQuery(query: String): CompletableFuture<T> {

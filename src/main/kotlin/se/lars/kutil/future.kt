@@ -10,6 +10,8 @@ fun <T> T.complete(future: CompletableFuture<T>) {
     future.complete(this)
 }
 
+fun <T> T.asCompleted() = CompletableFuture.completedFuture(this)
+
 fun <T> CompletionStage<T>.thenOn(context: Context): CompletionStage<T> {
     val future = CompletableFuture<T>()
     whenComplete { result, error ->
@@ -43,4 +45,17 @@ fun <T> succeededOptional(optional: Optional<T>): CompletableFuture<T> {
 fun succeededOptionalInt(optional: OptionalInt): CompletableFuture<Int> {
     return if (optional.isPresent) CompletableFuture.completedFuture(optional.asInt)
     else CompletableFuture.completedFuture(null)
+}
+
+fun <T> List<CompletableFuture<T>>.awaitAll(): CompletableFuture<List<T>> {
+    val promise = CompletableFuture<List<T>>()
+    CompletableFuture.allOf(*this.toTypedArray())
+            .whenComplete { _, ex ->
+                if (ex != null)
+                    promise.completeExceptionally(ex)
+                else
+                    promise.complete(this.map { it.join() })
+            }
+
+    return promise
 }
