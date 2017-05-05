@@ -8,14 +8,15 @@ import se.lars.kutil.awaitAll
 import java.util.concurrent.CompletableFuture
 import javax.inject.Inject
 
-class HackerNewsService @Inject constructor(private val api: IHackerNewsApi) : IHackerNewsService {
-    override fun topStories(): CompletableFuture<List<Story>> {
-        val promise = CompletableFuture<List<Story>>()
-        return api.topStories().thenApply { storyIds -> storyIds.map { id -> story(id) } }
-                .whenComplete { result, ex ->
-                    result.awaitAll()
-                }
-        return promise
+class HackerNewsService
+@Inject constructor(
+    private val api: IHackerNewsApi,
+    private val cache: IHackerNewsCache
+) : IHackerNewsService {
+
+    override fun topStories(first: Int): CompletableFuture<List<Story>> {
+        return cache.topStories(api::topStories)
+            .thenCompose { storyIds -> storyIds.take(first).map { id -> story(id) }.awaitAll() }
     }
 
     override fun comments(ids: List<Int>): CompletableFuture<List<Comment>> {
@@ -27,10 +28,10 @@ class HackerNewsService @Inject constructor(private val api: IHackerNewsApi) : I
     }
 
     private fun story(id: Int): CompletableFuture<Story> {
-        return api.story(id)
+        return cache.story(id, api::story)
     }
 
     private fun comment(id: Int): CompletableFuture<Comment> {
-        return api.comment(id)
+        return cache.comment(id, api::comment)
     }
 }

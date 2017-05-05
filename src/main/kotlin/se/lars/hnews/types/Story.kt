@@ -9,5 +9,5 @@ data class Story(
         val text: String?,
         val url: String?,
         @JsonProperty("kids")
-        val comments: List<Int>
+        val comments: List<Int>? = emptyList()
 )

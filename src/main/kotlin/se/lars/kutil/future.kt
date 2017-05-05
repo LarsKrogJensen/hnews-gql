@@ -51,10 +51,7 @@ fun <T> List<CompletableFuture<T>>.awaitAll(): CompletableFuture<List<T>> {
     val promise = CompletableFuture<List<T>>()
     CompletableFuture.allOf(*this.toTypedArray())
             .whenComplete { _, ex ->
-                if (ex != null)
-                    promise.completeExceptionally(ex)
-                else
-                    promise.complete(this.map { it.join() })
+                promise.complete(this.map { it.join() }, ex)
             }
 
     return promise

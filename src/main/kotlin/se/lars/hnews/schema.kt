@@ -1,5 +1,6 @@
 package se.lars.hnews
 
+import graphql.GraphQLInt
 import graphql.GraphQLStringNonNull
 import graphql.schema.*
 import se.lars.hnews.types.Comment
@@ -26,19 +27,11 @@ private val commentType = newObject {
     field<String> {
         name = "id"
         type = GraphQLStringNonNull
-        fetcher { env -> env.source<Story>().id.asCompleted() }
-    }
-    field<String> {
-        name = "title"
-        fetcher { env -> env.source<Story>().title.asCompleted() }
+        fetcher { env -> env.source<Comment>().id.asCompleted() }
     }
     field<String> {
         name = "text"
-        fetcher { env -> env.source<Story>().text.asCompleted() }
-    }
-    field<String> {
-        name = "url"
-        fetcher { env -> env.source<Story>().text.asCompleted() }
+        fetcher { env -> env.source<Comment>().text.asCompleted() }
     }
 }
 
@@ -59,14 +52,16 @@ private val storyType = newObject {
     }
     field<String> {
         name = "url"
-        fetcher { env -> env.source<Story>().text.asCompleted() }
+        fetcher { env -> env.source<Story>().url.asCompleted() }
     }
     field<List<Comment>> {
         name = "comments"
         type = GraphQLList(commentType)
         fetcher { env ->
-            val commentIds = env.source<Story>().comments
-            env.context<RequestContext>().hackerNews.comments(commentIds)
+            val commentIds = env.source<Story>().comments ?: emptyList()
+            val comments = env.context<RequestContext>().hackerNews.comments(commentIds)
+            comments.thenRun { println("Comments completed") }
+            comments
         }
     }
     field<User> {
@@ -81,8 +76,14 @@ private val storyType = newObject {
 private val topStoriesQuery = newField<List<Story>> {
     name = "topStories"
     type = GraphQLList(storyType)
+    argument {
+        name = "first"
+        description = "Show the first number of top stories"
+        type = GraphQLInt
+        defaultValue = 10
+    }
     fetcher = { env ->
-        env.context<RequestContext>().hackerNews.topStories()
+        env.context<RequestContext>().hackerNews.topStories(env.argument<Int>("first")!!)
     }
 }
 

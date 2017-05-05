@@ -20,9 +20,10 @@ class HackerNewsApi
 @Inject constructor(
         vertx: Vertx
 ) : IHackerNewsApi {
-    private val _log = loggerFor<HackerNewsApi>()
-    private val _httpClient: HttpClient
-    private val _mapper: ObjectMapper
+    private val baseUrl = "hacker-news.firebaseio.com";
+    private val log = loggerFor<HackerNewsApi>()
+    private val httpClient: HttpClient
+    private val mapper: ObjectMapper
 
     init {
 
@@ -39,10 +40,10 @@ class HackerNewsApi
         }
 
         // Http client is thread safe an a single instance is sufficent
-        _httpClient = vertx.createHttpClient(options)
+        httpClient = vertx.createHttpClient(options)
 
         // Create a json deserializer and hint it to ingore unknown properties
-        _mapper = ObjectMapper().apply {
+        mapper = ObjectMapper().apply {
             registerModule(Jdk8Module())
             registerModule(KotlinModule())
             configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
@@ -61,10 +62,6 @@ class HackerNewsApi
         return invokeQuery("/v0/item/$id.json")
     }
 
-    //    override fun comments(comments: List<Int>): CompletableFuture<List<Comment>> {
-//        return comments.map { invokeQuery<Comment>("/v0/item/$it.json") }.awaitAll()
-//    }
-
     override fun user(id: String): CompletableFuture<User> {
         return invokeQuery("/v0/user/$id.json")
     }
@@ -72,31 +69,33 @@ class HackerNewsApi
     inline private fun <reified T:Any> invokeQuery(query: String): CompletableFuture<T> {
         val future = CompletableFuture<T>()
 
-        _log.info("Query: $query")
+        log.info("Query: $query")
 
-        _httpClient.get(query)
-                .setTimeout(2000)
+        httpClient.get(query)
+                .setTimeout(30_000)
                 .exceptionHandler { ex -> future.completeExceptionally(ex) }
                 .handler { response ->
                     if (response.statusCode() == HttpResponseStatus.OK.code()) {
                         response.bodyHandler { buffer ->
                             try {
-                                val typeObj = _mapper.readValue(buffer.bytes, T::class.java)
+                                val typeObj = mapper.readValue(buffer.bytes, T::class.java)
                                 future.complete(typeObj)
                             } catch(e: Exception) {
-                                _log.error("Failed to invoke $query", e)
+                                log.error("Failed to invoke ${formatUrl(query)}", e)
                                 future.completeExceptionally(e)
                             }
                         }
                         response.exceptionHandler { e -> future.completeExceptionally(e) }
                     } else if (response.statusCode() == HttpResponseStatus.NOT_FOUND.code()) {
-                        _log.warn("Not found: $query")
+                        log.warn("Not found: ${formatUrl(query)}")
                         future.complete(null)
                     } else {
-                        _log.error("Failed to invoke $query status code ${response.statusCode()}")
+                        log.error("Failed to invoke ${formatUrl(query)} status code ${response.statusCode()}")
                         future.completeExceptionally(Exception(response.statusMessage()))
                     }
                 }.end()
         return future
     }
+
+    private fun formatUrl(query: String) = "https://$baseUrl$query"
 }

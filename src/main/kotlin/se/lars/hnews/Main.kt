@@ -58,13 +58,13 @@ private fun loadConfigStores(commandLine: CommandLine): ConfigRetrieverOptions {
     val config = commandLine.getOptionValue<String>("config")
 
     val mainStore = config?.let {
-        ConfigStoreOptions(type = "json", config = loadDefaultConfig())
-    } ?: ConfigStoreOptions(type = "file", format = "yaml", config = jsonObject("path" to config))
+        ConfigStoreOptions(type = "file", format = "yaml", config = jsonObject("path" to config))
+    } ?: ConfigStoreOptions(type = "json", config = loadDefaultConfig())
 
     return ConfigRetrieverOptions(stores = listOf(
-            mainStore,
-            ConfigStoreOptions(type = "sys"),
-            ConfigStoreOptions(type = "env")
+        mainStore,
+        ConfigStoreOptions(type = "sys"),
+        ConfigStoreOptions(type = "env")
     ))
 }
 
