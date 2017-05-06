@@ -21,6 +21,14 @@ class HeapHackerNewsCache : IHackerNewsCache {
         return loader1
     }
 
+    override fun stories(ids: List<Int>, loader: (Int) -> CompletableFuture<Story>): CompletableFuture<List<Story>> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun comments(ids: List<Int>, loader: (Int) -> CompletableFuture<Comment>): CompletableFuture<List<Comment>> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun topStories(loader: () -> CompletableFuture<List<Int>>): CompletableFuture<List<Int>> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

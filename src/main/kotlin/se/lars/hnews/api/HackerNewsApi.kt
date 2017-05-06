@@ -1,14 +1,11 @@
 package se.lars.hnews.api
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.netty.handler.codec.http.HttpResponseStatus
 import io.vertx.core.Vertx
 import io.vertx.core.http.HttpClient
 import io.vertx.core.http.HttpClientOptions
 import io.vertx.core.http.HttpVersion
+import se.lars.hnews.defaultMapper
 import se.lars.hnews.types.Comment
 import se.lars.hnews.types.Story
 import se.lars.hnews.types.User
@@ -23,7 +20,7 @@ class HackerNewsApi
     private val baseUrl = "hacker-news.firebaseio.com";
     private val log = loggerFor<HackerNewsApi>()
     private val httpClient: HttpClient
-    private val mapper: ObjectMapper
+    private val mapper = defaultMapper
 
     init {
 
@@ -41,17 +38,10 @@ class HackerNewsApi
 
         // Http client is thread safe an a single instance is sufficent
         httpClient = vertx.createHttpClient(options)
-
-        // Create a json deserializer and hint it to ingore unknown properties
-        mapper = ObjectMapper().apply {
-            registerModule(Jdk8Module())
-            registerModule(KotlinModule())
-            configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        }
     }
 
     override fun topStories(): CompletableFuture<List<Int>> {
-        return invokeQuery<List<Int>>("/v0/topstories.json")
+        return invokeQuery("/v0/topstories.json")
     }
 
     override fun story(id: Int): CompletableFuture<Story> {
@@ -69,7 +59,7 @@ class HackerNewsApi
     inline private fun <reified T:Any> invokeQuery(query: String): CompletableFuture<T> {
         val future = CompletableFuture<T>()
 
-        log.info("Query: $query")
+        log.info("Query: ${formatUrl(query)}")
 
         httpClient.get(query)
                 .setTimeout(30_000)

@@ -33,6 +33,14 @@ private val commentType = newObject {
         name = "text"
         fetcher { env -> env.source<Comment>().text.asCompleted() }
     }
+    field<List<Comment>> {
+        name = "comments"
+        type = GraphQLList(GraphQLTypeReference("Comment"))
+        fetcher { env ->
+            val commentIds = env.source<Comment>().comments ?: emptyList()
+            env.context<RequestContext>().hackerNews.comments(commentIds)
+        }
+    }
 }
 
 private val storyType = newObject {
@@ -54,14 +62,20 @@ private val storyType = newObject {
         name = "url"
         fetcher { env -> env.source<Story>().url.asCompleted() }
     }
+    field<Int> {
+        name = "score"
+        fetcher { env -> env.source<Story>().score.asCompleted() }
+    }
+    field<Int> {
+        name = "descendants"
+        fetcher { env -> env.source<Story>().descendants.asCompleted() }
+    }
     field<List<Comment>> {
         name = "comments"
         type = GraphQLList(commentType)
         fetcher { env ->
             val commentIds = env.source<Story>().comments ?: emptyList()
-            val comments = env.context<RequestContext>().hackerNews.comments(commentIds)
-            comments.thenRun { println("Comments completed") }
-            comments
+            env.context<RequestContext>().hackerNews.comments(commentIds)
         }
     }
     field<User> {
