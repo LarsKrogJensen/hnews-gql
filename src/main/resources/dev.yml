@@ -3,3 +3,6 @@ http:
     useSsl: false
 metrics:
     enable: false
+redis:
+    host: 192.168.1.36
+    port: 6379

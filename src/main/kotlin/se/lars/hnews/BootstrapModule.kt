@@ -20,7 +20,6 @@ class BootstrapModule(private val config: JsonObject) : ModuleBase() {
         bind<IHackerNewsApi>().to<HackerNewsApi>().asSingleton()
         bind<IHackerNewsService>().to<HackerNewsService>().asSingleton()
         bind<IHackerNewsCache>().to<RedisHackerNewsCache>().asSingleton()
-//        bind<IHackerNewsCache>().to<HeapHackerNewsCache>().asSingleton()
         bind<GraphQLHandler>()
     }
 }

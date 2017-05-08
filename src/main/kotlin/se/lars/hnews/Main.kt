@@ -9,7 +9,6 @@ import io.vertx.core.VertxOptions
 import io.vertx.core.cli.CLI
 import io.vertx.core.cli.CommandLine
 import io.vertx.core.cli.Option
-import io.vertx.core.json.JsonObject
 import io.vertx.kotlin.config.ConfigRetrieverOptions
 import io.vertx.kotlin.config.ConfigStoreOptions
 import se.lars.guice.GuiceVerticleFactory
@@ -29,6 +28,10 @@ fun main(args: Array<String>) {
     val configStores = loadConfigStores(commandLine)
 
     val vertx = Vertx.vertx(VertxOptions())
+
+//    vertx.fileSystem().readFile("banner.txt") {
+//        println(it.result().toString())
+//    }
 
     ConfigRetriever.create(vertx, configStores).getConfig { configLoadResult ->
         if (configLoadResult.failed()) {
@@ -55,14 +58,10 @@ fun main(args: Array<String>) {
 
 
 private fun loadConfigStores(commandLine: CommandLine): ConfigRetrieverOptions {
-    val config = commandLine.getOptionValue<String>("config")
-
-    val mainStore = config?.let {
-        ConfigStoreOptions(type = "file", format = "yaml", config = jsonObject("path" to config))
-    } ?: ConfigStoreOptions(type = "json", config = loadDefaultConfig())
+    val config = commandLine.getOptionValue<String>("config")?: "dev.yml"
 
     return ConfigRetrieverOptions(stores = listOf(
-        mainStore,
+        ConfigStoreOptions(type = "file", format = "yaml", config = jsonObject("path" to config)),
         ConfigStoreOptions(type = "sys"),
         ConfigStoreOptions(type = "env")
     ))
@@ -91,7 +90,3 @@ fun displayBanner() {
     println(resource.readText())
 }
 
-fun loadDefaultConfig(): JsonObject {
-    val resource: URL = ClassLoader.getSystemClassLoader().getResource("dev.json")
-    return JsonObject(resource.readText())
-}

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import io.vertx.core.Vertx
 import io.vertx.redis.RedisClient
 import io.vertx.redis.RedisOptions
+import se.lars.hnews.IServerOptions
 import se.lars.hnews.defaultMapper
 import se.lars.hnews.types.Comment
 import se.lars.hnews.types.Story
@@ -16,12 +17,14 @@ import javax.inject.Inject
 class RedisHackerNewsCache
 @Inject
 constructor(
-    vertx: Vertx
+    vertx: Vertx,
+    options: IServerOptions
 ) : IHackerNewsCache {
     private val log = loggerFor<RedisHackerNewsCache>()
 
     private val redis: RedisClient = RedisClient.create(vertx, RedisOptions().apply {
-        host = "localhost"
+        host = options.redisHost
+        port = options.redisPort
     })
     private val mapper = defaultMapper
 

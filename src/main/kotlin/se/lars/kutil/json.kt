@@ -1,7 +1,6 @@
 package se.lars.kutil
 
 
-
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 
@@ -23,21 +22,28 @@ inline fun <T> json_(block: Json.() -> T): T = Json.block()
 
 //@Suppress("UNCHECKED_CAST") fun <T> JsonObject.get(key: String): T = getValue(key) as T
 
-fun JsonObject.resolveInt(path: String) : Int? {
+fun JsonObject.resolveInt(path: String): Int? {
     if (this.containsKey(path))
         return this.getInteger(path)
 
     return traversePath(this, path.split("."))
 }
 
-fun JsonObject.resolveBool(path: String) : Boolean? {
+fun JsonObject.resolveBool(path: String): Boolean? {
     if (this.containsKey(path))
         return this.getBoolean(path)
 
     return traversePath(this, path.split("."))
 }
 
-private fun <T :Any> traversePath(jsonObject: JsonObject, path: List<String>): T? {
+fun JsonObject.resolveString(path: String): String? {
+    if (this.containsKey(path))
+        return this.getString(path)
+
+    return traversePath(this, path.split("."))
+}
+
+private fun <T : Any> traversePath(jsonObject: JsonObject, path: List<String>): T? {
     if (path.size > 1) {
         return traversePath<T>(jsonObject.getJsonObject(path[0]), path.drop(1))
     }
