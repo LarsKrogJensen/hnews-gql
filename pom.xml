@@ -253,7 +253,7 @@
                 <configuration>
                     <appName>hnews-gql</appName>
                     <processTypes>
-                        <web>java $JAVA_OPTS -jar ${project.build.directory}/${project.artifactId}-fat.jar</web>
+                        <web>java $JAVA_OPTS -jar target/${project.artifactId}-fat.jar</web>
                     </processTypes>
                 </configuration>
             </plugin>

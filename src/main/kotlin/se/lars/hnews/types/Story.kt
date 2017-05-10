@@ -7,6 +7,8 @@ data class Story(
     val by: String,
     val descendants: Int,
     val score: Int,
+    @JsonProperty("time")
+    val timeEpoc: Long,
     val title: String?,
     val text: String?,
     val url: String?,

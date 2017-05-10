@@ -2,6 +2,7 @@ package se.lars.hnews.services
 
 import se.lars.hnews.types.Comment
 import se.lars.hnews.types.Story
+import se.lars.hnews.types.User
 import java.util.concurrent.CompletableFuture
 
 interface IHackerNewsCache {
@@ -11,4 +12,6 @@ interface IHackerNewsCache {
 
     fun story(id: Int, loader: (Int) -> CompletableFuture<Story>): CompletableFuture<Story>
     fun comment(id: Int, loader: (Int) -> CompletableFuture<Comment>): CompletableFuture<Comment>
+
+    fun user(id: String, loader: (String) -> CompletableFuture<User>): CompletableFuture<User>
 }

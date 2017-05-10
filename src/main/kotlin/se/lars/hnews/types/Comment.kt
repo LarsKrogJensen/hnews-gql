@@ -6,6 +6,8 @@ data class Comment(
     val id: String,
     @JsonProperty("parent")
     val parentId: String,
+    @JsonProperty("time")
+    val timeEpoc: Long,
     val text: String?,
     val by: String?,
     @JsonProperty("kids")

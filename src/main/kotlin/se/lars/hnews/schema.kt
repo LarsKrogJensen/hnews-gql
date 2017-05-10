@@ -33,6 +33,10 @@ private val commentType = newObject {
         name = "text"
         fetcher { env -> env.source<Comment>().text.asCompleted() }
     }
+    field<Long> {
+        name = "time"
+        fetcher { env -> env.source<Comment>().timeEpoc.asCompleted() }
+    }
     field<List<Comment>> {
         name = "comments"
         type = GraphQLList(GraphQLTypeReference("Comment"))
@@ -57,6 +61,10 @@ private val storyType = newObject {
     field<String> {
         name = "text"
         fetcher { env -> env.source<Story>().text.asCompleted() }
+    }
+    field<Long> {
+        name = "time"
+        fetcher { env -> env.source<Story>().timeEpoc.asCompleted() }
     }
     field<String> {
         name = "url"

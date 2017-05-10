@@ -8,6 +8,7 @@ import se.lars.hnews.IServerOptions
 import se.lars.hnews.defaultMapper
 import se.lars.hnews.types.Comment
 import se.lars.hnews.types.Story
+import se.lars.hnews.types.User
 import se.lars.kutil.awaitAll
 import se.lars.kutil.complete
 import se.lars.kutil.loggerFor
@@ -25,6 +26,8 @@ constructor(
     private val redis: RedisClient = RedisClient.create(vertx, RedisOptions().apply {
         host = options.redisHost
         port = options.redisPort
+        auth = options.redisAuth
+        log.info("Connection to Redis on '${options.redisHost}:${options.redisPort}'")
     })
     private val mapper = defaultMapper
 
@@ -41,6 +44,10 @@ constructor(
     override fun comment(id: Int, loader: (Int) -> CompletableFuture<Comment>) = getOrLoad(id, loader)
 
     override fun topStories(loader: () -> CompletableFuture<List<Int>>) = getOrLoad("topstories", { loader() })
+
+    override fun user(id: String, loader: (String) -> CompletableFuture<User>): CompletableFuture<User> {
+        return getOrLoad(id, loader)
+    }
 
     inline private fun <reified TKey : Any, reified TValue : Any> getOrLoad(key: TKey, crossinline loader: (TKey) -> CompletableFuture<TValue>): CompletableFuture<TValue> {
         val promise = CompletableFuture<TValue>()

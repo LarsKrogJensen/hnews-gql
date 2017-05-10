@@ -23,7 +23,7 @@ class HackerNewsService
     }
 
     override fun user(id: String): CompletableFuture<User> {
-        return api.user(id)
+        return cache.user(id, api::user)
     }
 
     private fun story(id: Int): CompletableFuture<Story> {

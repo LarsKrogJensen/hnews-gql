@@ -13,6 +13,7 @@ interface IServerOptions {
     val enableMetrics: Boolean
     val redisHost: String
     val redisPort: Int
+    val redisAuth: String?
 }
 
 class ServerOptions
@@ -33,17 +34,23 @@ constructor(
     override val enableMetrics: Boolean
         get() = config.resolveBool("metrics.enable") ?: false
 
+    override val redisAuth: String?
+            get() = resolveHerokuRedisUrl()?.first ?: config.resolveString("redis.auth") ?: null
+
     override val redisHost: String
-        get() = resolveHerokuRedisUrl()?.first ?: config.resolveString("redis.host") ?: "localhost"
+        get() = resolveHerokuRedisUrl()?.second ?: config.resolveString("redis.host") ?: "localhost"
 
     override val redisPort: Int
-        get() = resolveHerokuRedisUrl()?.second ?: config.resolveInt("redis.port") ?: 6379
+        get() = resolveHerokuRedisUrl()?.third ?: config.resolveInt("redis.port") ?: 6379
 
-    private fun resolveHerokuRedisUrl(): Pair<String, Int>? {
+    private fun resolveHerokuRedisUrl(): Triple<String, String, Int>? {
         return config.resolveString("REDIS_URL")?.let { url ->
-            val hostAndPort = url.removePrefix("redis://")
-            val portIdx = hostAndPort.lastIndexOf(":")
-            Pair(hostAndPort.substring(0, portIdx), hostAndPort.substring(portIdx + 1).toInt())
+            val strippedUrl = url.removePrefix("redis://h:")
+            val hostIdx = strippedUrl.lastIndexOf("@")
+            val portIdx = strippedUrl.lastIndexOf(":")
+            Triple(strippedUrl.substring(0, hostIdx),
+                   strippedUrl.substring(hostIdx + 1, portIdx),
+                   strippedUrl.substring(portIdx + 1).toInt())
         }
     }
 }

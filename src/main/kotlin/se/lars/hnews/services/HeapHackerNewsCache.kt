@@ -2,11 +2,16 @@ package se.lars.hnews.services
 
 import se.lars.hnews.types.Comment
 import se.lars.hnews.types.Story
+import se.lars.hnews.types.User
 import se.lars.kutil.asCompleted
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 
 class HeapHackerNewsCache : IHackerNewsCache {
+    override fun user(id: String, loader: (String) -> CompletableFuture<User>): CompletableFuture<User> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     private val stories: ConcurrentHashMap<Int, Story> = ConcurrentHashMap()
     private val comments: ConcurrentHashMap<Int, Comment> = ConcurrentHashMap()
 

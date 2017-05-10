@@ -6,7 +6,6 @@ import graphql.newGraphQL
 import io.vertx.core.Handler
 import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
-import io.vertx.ext.auth.User
 import io.vertx.ext.web.RoutingContext
 import se.lars.hnews.services.IHackerNewsService
 import se.lars.kutil.jsonObject
@@ -14,7 +13,7 @@ import se.lars.kutil.loggerFor
 import se.lars.kutil.thenOn
 import java.nio.charset.Charset
 
-abstract class GraphQLHandlerBase(val hackerNews: IHackerNewsService ) : Handler<RoutingContext> {
+abstract class GraphQLHandlerBase(val hackerNews: IHackerNewsService) : Handler<RoutingContext> {
 
     val log = loggerFor<GraphQLHandlerBase>()
 
@@ -51,15 +50,20 @@ abstract class GraphQLHandlerBase(val hackerNews: IHackerNewsService ) : Handler
         val context = RequestContext(hackerNews)
 
         graphQL.execute(query, operation, context, variables)
-                .thenOn(Vertx.currentContext())
-                .thenAccept { result ->
-                    val jsonResponse = if (result.succeeded()) {
-                        jsonObject("data" to result.data())
-                    } else {
-                        jsonObject("errors" to deccodeErrors(result.errors))
-                    }
-                    handler(jsonResponse)
+            .thenOn(Vertx.currentContext())
+            .thenAccept { result ->
+                val jsonResponse = if (result.succeeded()) {
+                    jsonObject("data" to result.data())
+                } else {
+                    jsonObject("errors" to deccodeErrors(result.errors))
                 }
+                handler(jsonResponse)
+            }
+            .exceptionally {
+                log.error("Execution error", it)
+                handler(jsonObject("errors" to "Internal Server Error"))
+                null
+            }
     }
 
     fun deccodeErrors(errors: List<GraphQLError>): Any? {
