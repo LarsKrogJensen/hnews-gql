@@ -3,10 +3,12 @@ package se.lars.hnews
 import graphql.GraphQLInt
 import graphql.GraphQLStringNonNull
 import graphql.schema.*
+import se.lars.hnews.services.StoryType
 import se.lars.hnews.types.Comment
 import se.lars.hnews.types.Story
 import se.lars.hnews.types.User
 import se.lars.kutil.asCompleted
+import se.lars.kutil.succeeded
 
 
 private val userType = newObject {
@@ -43,6 +45,17 @@ private val commentType = newObject {
         fetcher { env ->
             val commentIds = env.source<Comment>().comments ?: emptyList()
             env.context<RequestContext>().hackerNews.comments(commentIds)
+        }
+    }
+    field<User> {
+        name = "by"
+        type = userType
+        fetcher { env ->
+            val comment = env.source<Comment>()
+            if (comment.by != null)
+                env.context<RequestContext>().hackerNews.user(comment.by)
+            else
+                succeeded(null)
         }
     }
 }
@@ -105,7 +118,95 @@ private val topStoriesQuery = newField<List<Story>> {
         defaultValue = 10
     }
     fetcher = { env ->
-        env.context<RequestContext>().hackerNews.topStories(env.argument<Int>("first")!!)
+        env.context<RequestContext>().hackerNews.stories(StoryType.Top, env.argument<Int>("first")!!)
+    }
+}
+
+private val bestStoriesQuery = newField<List<Story>> {
+    name = "bestStories"
+    type = GraphQLList(storyType)
+    argument {
+        name = "first"
+        description = "Show the first number of best stories"
+        type = GraphQLInt
+        defaultValue = 10
+    }
+    fetcher = { env ->
+        env.context<RequestContext>().hackerNews.stories(StoryType.Best, env.argument<Int>("first")!!)
+    }
+}
+
+private val newStoriesQuery = newField<List<Story>> {
+    name = "newStories"
+    type = GraphQLList(storyType)
+    argument {
+        name = "first"
+        description = "Show the first number of new stories"
+        type = GraphQLInt
+        defaultValue = 10
+    }
+    fetcher = { env ->
+        env.context<RequestContext>().hackerNews.stories(StoryType.New, env.argument<Int>("first")!!)
+    }
+}
+
+private val askStoriesQuery = newField<List<Story>> {
+    name = "askStories"
+    type = GraphQLList(storyType)
+    argument {
+        name = "first"
+        description = "Show the first number of ask stories"
+        type = GraphQLInt
+        defaultValue = 10
+    }
+    fetcher = { env ->
+        env.context<RequestContext>().hackerNews.stories(StoryType.Ask, env.argument<Int>("first")!!)
+    }
+}
+
+
+private val showStoriesQuery = newField<List<Story>> {
+    name = "showStories"
+    type = GraphQLList(storyType)
+    argument {
+        name = "first"
+        description = "Show the first number of show stories"
+        type = GraphQLInt
+        defaultValue = 10
+    }
+    fetcher = { env ->
+        env.context<RequestContext>().hackerNews.stories(StoryType.Show, env.argument<Int>("first")!!)
+    }
+}
+
+
+private val jobStoriesQuery = newField<List<Story>> {
+    name = "jobStories"
+    type = GraphQLList(storyType)
+    argument {
+        name = "first"
+        description = "Show the first number of job stories"
+        type = GraphQLInt
+        defaultValue = 10
+    }
+    fetcher = { env ->
+        env.context<RequestContext>().hackerNews.stories(StoryType.Job, env.argument<Int>("first")!!)
+    }
+}
+
+
+
+private val storyQuery = newField<Story> {
+    name = "story"
+    type = storyType
+    argument {
+        name = "id"
+        description = "Story identifier"
+        type = GraphQLStringNonNull
+    }
+    fetcher = { env ->
+        val id = env.argument<String>("id")!!.toInt()
+        env.context<RequestContext>().hackerNews.story(id)
     }
 }
 
@@ -113,5 +214,11 @@ val hackeNewsSchema = newSchema {
     query = newObject {
         name = "QueryType"
         fields += topStoriesQuery
+        fields += newStoriesQuery
+        fields += bestStoriesQuery
+        fields += askStoriesQuery
+        fields += showStoriesQuery
+        fields += jobStoriesQuery
+        fields += storyQuery
     }
 }

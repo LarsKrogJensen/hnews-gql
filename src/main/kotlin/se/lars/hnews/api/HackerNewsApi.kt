@@ -6,6 +6,7 @@ import io.vertx.core.http.HttpClient
 import io.vertx.core.http.HttpClientOptions
 import io.vertx.core.http.HttpVersion
 import se.lars.hnews.defaultMapper
+import se.lars.hnews.services.StoryType
 import se.lars.hnews.types.Comment
 import se.lars.hnews.types.Story
 import se.lars.hnews.types.User
@@ -15,7 +16,7 @@ import javax.inject.Inject
 
 class HackerNewsApi
 @Inject constructor(
-        vertx: Vertx
+    vertx: Vertx
 ) : IHackerNewsApi {
     private val baseUrl = "hacker-news.firebaseio.com";
     private val log = loggerFor<HackerNewsApi>()
@@ -40,8 +41,8 @@ class HackerNewsApi
         httpClient = vertx.createHttpClient(options)
     }
 
-    override fun topStories(): CompletableFuture<List<Int>> {
-        return invokeQuery("/v0/topstories.json")
+    override fun stories(type: StoryType): CompletableFuture<List<Int>> {
+        return invokeQuery("/v0/${type.query}.json")
     }
 
     override fun story(id: Int): CompletableFuture<Story> {
@@ -56,34 +57,34 @@ class HackerNewsApi
         return invokeQuery("/v0/user/$id.json")
     }
 
-    inline private fun <reified T:Any> invokeQuery(query: String): CompletableFuture<T> {
+    inline private fun <reified T : Any> invokeQuery(query: String): CompletableFuture<T> {
         val future = CompletableFuture<T>()
 
         log.info("Query: ${formatUrl(query)}")
 
         httpClient.get(query)
-                .setTimeout(30_000)
-                .exceptionHandler { ex -> future.completeExceptionally(ex) }
-                .handler { response ->
-                    if (response.statusCode() == HttpResponseStatus.OK.code()) {
-                        response.bodyHandler { buffer ->
-                            try {
-                                val typeObj = mapper.readValue(buffer.bytes, T::class.java)
-                                future.complete(typeObj)
-                            } catch(e: Exception) {
-                                log.error("Failed to invoke ${formatUrl(query)}", e)
-                                future.completeExceptionally(e)
-                            }
+            .setTimeout(30_000)
+            .exceptionHandler { ex -> future.completeExceptionally(ex) }
+            .handler { response ->
+                if (response.statusCode() == HttpResponseStatus.OK.code()) {
+                    response.bodyHandler { buffer ->
+                        try {
+                            val typeObj = mapper.readValue(buffer.bytes, T::class.java)
+                            future.complete(typeObj)
+                        } catch(e: Exception) {
+                            log.error("Failed to invoke ${formatUrl(query)}", e)
+                            future.completeExceptionally(e)
                         }
-                        response.exceptionHandler { e -> future.completeExceptionally(e) }
-                    } else if (response.statusCode() == HttpResponseStatus.NOT_FOUND.code()) {
-                        log.warn("Not found: ${formatUrl(query)}")
-                        future.complete(null)
-                    } else {
-                        log.error("Failed to invoke ${formatUrl(query)} status code ${response.statusCode()}")
-                        future.completeExceptionally(Exception(response.statusMessage()))
                     }
-                }.end()
+                    response.exceptionHandler { e -> future.completeExceptionally(e) }
+                } else if (response.statusCode() == HttpResponseStatus.NOT_FOUND.code()) {
+                    log.warn("Not found: ${formatUrl(query)}")
+                    future.complete(null)
+                } else {
+                    log.error("Failed to invoke ${formatUrl(query)} status code ${response.statusCode()}")
+                    future.completeExceptionally(Exception(response.statusMessage()))
+                }
+            }.end()
         return future
     }
 

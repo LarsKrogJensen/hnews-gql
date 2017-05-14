@@ -1,12 +1,13 @@
 
 import io.vertx.core.Vertx
 import se.lars.hnews.api.HackerNewsApi
+import se.lars.hnews.services.StoryType
 
 fun main(args: Array<String>) {
     val vertx = Vertx.vertx();
     val api = HackerNewsApi(vertx);
 
-    api.topStories().whenComplete { r, t ->
+    api.stories(StoryType.Top).whenComplete { r, t ->
         if (t != null)
             t.printStackTrace()
         else {

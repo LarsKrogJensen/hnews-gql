@@ -6,7 +6,8 @@ import se.lars.hnews.types.User
 import java.util.concurrent.CompletableFuture
 
 interface IHackerNewsService {
-    fun topStories(first: Int): CompletableFuture<List<Story>>
+    fun stories(type: StoryType, first: Int): CompletableFuture<List<Story>>
+    fun story(id: Int): CompletableFuture<Story>
     fun comments(ids: List<Int>): CompletableFuture<List<Comment>>
     fun user(id: String): CompletableFuture<User>
 }

@@ -13,8 +13,8 @@ class HackerNewsService
     private val cache: IHackerNewsCache
 ) : IHackerNewsService {
 
-    override fun topStories(first: Int): CompletableFuture<List<Story>> {
-        return cache.topStories(api::topStories)
+    override fun stories(type: StoryType, first: Int): CompletableFuture<List<Story>> {
+        return cache.stories(type, api::stories)
             .thenCompose { storyIds -> cache.stories(storyIds.take(first), api::story) }
     }
 
@@ -26,7 +26,7 @@ class HackerNewsService
         return cache.user(id, api::user)
     }
 
-    private fun story(id: Int): CompletableFuture<Story> {
+    override fun story(id: Int): CompletableFuture<Story> {
         return cache.story(id, api::story)
     }
 

@@ -43,7 +43,7 @@ constructor(
 
     override fun comment(id: Int, loader: (Int) -> CompletableFuture<Comment>) = getOrLoad(id, loader)
 
-    override fun topStories(loader: () -> CompletableFuture<List<Int>>) = getOrLoad("topstories", { loader() })
+    override fun stories(type: StoryType, loader: (type: StoryType) -> CompletableFuture<List<Int>>) = getOrLoad(type.query, { loader(type) })
 
     override fun user(id: String, loader: (String) -> CompletableFuture<User>): CompletableFuture<User> {
         return getOrLoad(id, loader)
