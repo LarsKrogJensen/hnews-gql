@@ -10,4 +10,5 @@ interface IHackerNewsService {
     fun story(id: Int): CompletableFuture<Story>
     fun comments(ids: List<Int>): CompletableFuture<List<Comment>>
     fun user(id: String): CompletableFuture<User>
+    fun search(query: String): CompletableFuture<List<Story>>
 }

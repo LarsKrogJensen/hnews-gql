@@ -194,6 +194,18 @@ private val jobStoriesQuery = newField<List<Story>> {
     }
 }
 
+private val searchQuery = newField<List<Story>> {
+    name = "search"
+    type = GraphQLList(storyType)
+    argument {
+        name = "query"
+        description = "Search query"
+        type = GraphQLStringNonNull
+    }
+    fetcher = { env ->
+        env.context<RequestContext>().hackerNews.search(env.argument<String>("query")!!)
+    }
+}
 
 
 private val storyQuery = newField<Story> {
@@ -220,5 +232,6 @@ val hackeNewsSchema = newSchema {
         fields += showStoriesQuery
         fields += jobStoriesQuery
         fields += storyQuery
+        fields += searchQuery
     }
 }

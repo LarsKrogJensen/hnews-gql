@@ -3,6 +3,7 @@ package se.lars.hnews
 import io.vertx.core.Vertx
 import io.vertx.kotlin.redis.RedisOptions
 import io.vertx.redis.RedisClient
+import se.lars.hnews.api.AlgoliaSearchApi
 
 class RedisClientVerticle : io.vertx.core.AbstractVerticle() {
     override fun start() {
@@ -31,5 +32,8 @@ class RedisClientVerticle : io.vertx.core.AbstractVerticle() {
 
 fun main(args: Array<String>) {
     val vertx = Vertx.vertx()
-    vertx.deployVerticle(RedisClientVerticle::class.java.name)
+//    vertx.deployVerticle(RedisClientVerticle::class.java.name)
+
+    val search = AlgoliaSearchApi(vertx)
+    search.search("graphql")
 }
