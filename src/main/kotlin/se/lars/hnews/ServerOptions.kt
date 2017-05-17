@@ -35,7 +35,7 @@ constructor(
         get() = config.resolveBool("metrics.enable") ?: false
 
     override val redisAuth: String?
-            get() = resolveHerokuRedisUrl()?.first ?: config.resolveString("redis.auth") ?: null
+            get() = resolveHerokuRedisUrl()?.first ?: config.resolveString("redis.auth")
 
     override val redisHost: String
         get() = resolveHerokuRedisUrl()?.second ?: config.resolveString("redis.host") ?: "localhost"
