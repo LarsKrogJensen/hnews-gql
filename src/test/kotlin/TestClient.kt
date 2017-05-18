@@ -1,4 +1,6 @@
 import io.vertx.core.Vertx
+import se.lars.hnews.defaultMapper
+import se.lars.hnews.services.StoryUpdateEvent
 import se.lars.sse.EventSourceStream
 
 fun main(args: Array<String>) {
@@ -34,7 +36,7 @@ fun main(args: Array<String>) {
 //        println("PUT: ---------------------")
 //        println(it)
 //        if (it.event == "put") {
-//            handleStories(mapper.readValue(it.data, StoryUpdateEvent::class.java))
+//            handleStories()
 //        }
 //        println()
 //
@@ -48,6 +50,7 @@ fun main(args: Array<String>) {
     EventSourceStream(vertx, host = "hacker-news.firebaseio.com")
         .connect("/v0/topstories.json?sse=true")
         .filter { it.event == "put" }
+        .map { defaultMapper.readValue(it.data, StoryUpdateEvent::class.java)}
         .subscribe({ event ->
                        println(event)
                    },
@@ -63,7 +66,3 @@ fun handleStories(updateEvent: StoryUpdateEvent) {
     println(updateEvent)
 }
 
-data class StoryUpdateEvent(
-    val path: String,
-    val data: List<String>
-)

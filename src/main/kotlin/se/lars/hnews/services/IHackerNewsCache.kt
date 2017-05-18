@@ -17,4 +17,6 @@ interface IHackerNewsCache {
     fun comment(id: Int, loader: (Int) -> CompletableFuture<Comment>): CompletableFuture<Comment>
 
     fun user(id: String, loader: (String) -> CompletableFuture<User>): CompletableFuture<User>
+
+    fun updateStories(storyType: StoryType, ids: List<Int>)
 }

@@ -2,7 +2,6 @@ package se.lars.sse
 
 import io.vertx.core.AsyncResult
 import io.vertx.core.VertxException
-import io.vertx.core.buffer.Buffer
 import io.vertx.core.http.HttpClient
 
 class EventSource(val client: HttpClient) : IEventSource {
@@ -13,24 +12,27 @@ class EventSource(val client: HttpClient) : IEventSource {
     private val currentPacket: SSEPacket = SSEPacket()
     private var closeHandler: () -> Unit = {}
 
-    override fun connect(path: String, handler: (AsyncResult<Void>) -> Unit): IEventSource {
-        return connect(path, null, handler)
+    override fun connect(path: String, openHandler: (AsyncResult<Void>) -> Unit): IEventSource {
+        return connect(path, null, openHandler)
     }
 
-    override fun connect(path: String, lastEventId: String?, handler: (AsyncResult<Void>) -> Unit): IEventSource {
+    override fun connect(path: String,
+                         lastEventId: String?,
+                         openHandler: (AsyncResult<Void>) -> Unit): IEventSource {
         if (connected) {
             throw VertxException("SSEConnection already connected")
         }
         val request = client.get(path) { response ->
             if (response.statusCode() != 200) {
-                handler(SSEAsyncResult(ConnectionRefusedException(response)))
+                openHandler(SSEAsyncResult(ConnectionRefusedException(response)))
             } else {
                 connected = true
-                response.handler(this::handleMessage)
-                response.endHandler {
+                response.handler {
+                    currentPacket.append(it).forEach(messageHandler)
+                }.endHandler {
                     closeHandler()
                 }
-                handler(SSEAsyncResult())
+                openHandler(SSEAsyncResult())
             }
         }
         with(request) {
@@ -47,7 +49,6 @@ class EventSource(val client: HttpClient) : IEventSource {
     }
 
     override fun close(): IEventSource {
-        client.close()
         connected = false
         return this
     }
@@ -64,9 +65,6 @@ class EventSource(val client: HttpClient) : IEventSource {
 
     override fun lastId() = lastId
 
-    private fun handleMessage(buffer: Buffer) {
-        currentPacket.append(buffer).forEach(messageHandler)
-    }
 }
 
 

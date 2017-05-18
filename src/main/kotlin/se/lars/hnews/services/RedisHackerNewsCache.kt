@@ -21,6 +21,8 @@ constructor(
     vertx: Vertx,
     options: IServerOptions
 ) : IHackerNewsCache {
+
+
     private val log = loggerFor<RedisHackerNewsCache>()
 
     private val redis: RedisClient = RedisClient.create(vertx, RedisOptions().apply {
@@ -30,6 +32,10 @@ constructor(
         log.info("Connection to Redis on '${options.redisHost}:${options.redisPort}'")
     })
     private val mapper = defaultMapper
+
+    override fun updateStories(storyType: StoryType, ids: List<Int>) {
+        storeItem(storyType.query, ids)
+    }
 
     override fun story(id: Int, loader: (Int) -> CompletableFuture<Story>) = getOrLoad(id, loader)
 

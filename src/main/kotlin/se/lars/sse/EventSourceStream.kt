@@ -18,7 +18,7 @@ class EventSourceStream(
             defaultHost = host
             defaultPort = port
             isKeepAlive = true
-            idleTimeout = 30
+            idleTimeout = 90
             isSsl = useSsl
         }
         client = vertx.createHttpClient(options)
@@ -26,7 +26,7 @@ class EventSourceStream(
 
     fun connect(path: String): Flux<Event> {
         return Flux.create { sink ->
-            IEventSource.create(client).connect(path) {
+            createEventSource(client).connect(path) {
                 if(it.failed()) {
                     sink.error(it.cause())
                 }

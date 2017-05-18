@@ -4,16 +4,9 @@ import io.vertx.core.http.HttpClientResponse
 
 class ConnectionRefusedException(private val response: HttpClientResponse) : Exception(response.statusMessage()) {
 
-    fun statusCode(): Int {
-        return response.statusCode()
-    }
+    val statusCode: Int
+        get() = response.statusCode()
 
-    fun statusMessage(): String {
-        return response.statusMessage()
-    }
-
-    companion object {
-
-        private val serialVersionUID = -6440236022622195797L
-    }
+    val statusMessage: String
+        get() = response.statusMessage()
 }
