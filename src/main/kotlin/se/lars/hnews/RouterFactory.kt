@@ -13,6 +13,7 @@ import javax.inject.Inject
 class RouterFactory
 @Inject constructor(
         val graphQLHandler: GraphQLHandler,
+        val graphQLHandlerWS: GraphQLHandlerWS,
         val vertx: Vertx
 ) : IRouterFactory {
     override fun router(): Router {
@@ -23,12 +24,12 @@ class RouterFactory
             allowedHeaders(setOf("content-type", "authorization"))
         }
 
-
         return router(vertx) {
             route().handler(AccessLogHandler.create("%r %s \"%{Content-Type}o\" %D %T %B"))
             route().handler(corsHandler)
             route().handler(BodyHandler.create())
             route("/graphql").handler(graphQLHandler)
+            route("/graphqlws").handler(graphQLHandlerWS)
             route("/*").handler(StaticHandler.create().setCachingEnabled(false))
         }
     }

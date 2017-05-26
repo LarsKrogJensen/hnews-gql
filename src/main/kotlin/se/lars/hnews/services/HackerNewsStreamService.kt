@@ -22,7 +22,7 @@ constructor(
 
     init {
         streams = StoryType.values().map { storyType ->
-            storyType to this.createStream(storyType)
+            storyType to createStream(storyType)
         }.toMap()
 
         feedSynchronizers = streams.entries.map { (storyType, stream) ->

@@ -9,6 +9,7 @@ import se.lars.hnews.types.Story
 import se.lars.hnews.types.User
 import se.lars.kutil.asCompleted
 import se.lars.kutil.succeeded
+import java.time.LocalDateTime
 
 
 private val userType = newObject {
@@ -222,6 +223,42 @@ private val storyQuery = newField<Story> {
     }
 }
 
+val timeType = newObject {
+    name = "Time"
+    field<Int> {
+        name = "hour"
+        type = GraphQLNonNull(GraphQLInt)
+        fetcher { env ->
+            env.source<LocalDateTime>().hour.asCompleted()
+        }
+    }
+    field<Int> {
+        name = "min"
+        type = GraphQLNonNull(GraphQLInt)
+        fetcher { env ->
+            env.source<LocalDateTime>().minute.asCompleted()
+        }
+    }
+    field<Int> {
+        name = "sec"
+        type = GraphQLNonNull(GraphQLInt)
+        fetcher { env ->
+            env.source<LocalDateTime>().second.asCompleted()
+        }
+    }
+}
+
+val subscriptionRoot = newSubscriptionObject {
+    name = "SubscriptionRoot"
+    subscription<LocalDateTime> {
+        name = "timeSub"
+        type = GraphQLNonNull(timeType)
+        publisher { env ->
+            env.context<RequestContext>().hackerNews.time()
+        }
+    }
+}
+
 val hackeNewsSchema = newSchema {
     query = newObject {
         name = "QueryType"
@@ -234,4 +271,5 @@ val hackeNewsSchema = newSchema {
         fields += storyQuery
         fields += searchQuery
     }
+    subscription = subscriptionRoot
 }

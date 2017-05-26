@@ -21,6 +21,7 @@ class BootstrapModule(private val config: JsonObject) : ModuleBase() {
         bind<IHackerNewsService>().to<HackerNewsService>()
         bind<IHackerNewsCache>().to<RedisHackerNewsCache>()
         bind<GraphQLHandler>()
+        bind<GraphQLHandlerWS>()
         bind<IHackerNewsStreamService>().to<HackerNewsStreamService>().asEagerSingleton()
     }
 }

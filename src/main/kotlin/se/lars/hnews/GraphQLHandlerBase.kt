@@ -31,7 +31,6 @@ abstract class GraphQLHandlerBase(val hackerNews: IHackerNewsService) : Handler<
             return
         }
 
-
         val graphQL = newGraphQL {
             schema = hackeNewsSchema
             instrumentation = NoOpInstrumentation.INSTANCE
