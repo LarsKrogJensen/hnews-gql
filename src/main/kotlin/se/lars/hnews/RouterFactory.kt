@@ -12,9 +12,9 @@ import javax.inject.Inject
 
 class RouterFactory
 @Inject constructor(
-        val graphQLHandler: GraphQLHandler,
-        val graphQLHandlerWS: GraphQLHandlerWS,
-        val vertx: Vertx
+    val graphQLHandler: GraphQLHandler,
+    val subscriptionHandler: SubscriptionHandler,
+    val vertx: Vertx
 ) : IRouterFactory {
     override fun router(): Router {
         // configure cross domain access
@@ -29,7 +29,7 @@ class RouterFactory
             route().handler(corsHandler)
             route().handler(BodyHandler.create())
             route("/graphql").handler(graphQLHandler)
-            route("/subscriptions").handler(graphQLHandlerWS)
+            route("/subscriptions").handler(subscriptionHandler)
             route("/*").handler(StaticHandler.create().setCachingEnabled(false))
         }
     }
