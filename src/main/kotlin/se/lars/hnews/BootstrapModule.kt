@@ -7,7 +7,10 @@ import se.lars.hnews.api.AlgoliaSearchApi
 import se.lars.hnews.api.HackerNewsApi
 import se.lars.hnews.api.IHackerNewsApi
 import se.lars.hnews.api.ISearchApi
-import se.lars.hnews.services.*
+import se.lars.hnews.services.HackerNewsService
+import se.lars.hnews.services.IHackerNewsCache
+import se.lars.hnews.services.IHackerNewsService
+import se.lars.hnews.services.RedisHackerNewsCache
 
 
 class BootstrapModule(private val config: JsonObject) : ModuleBase() {
@@ -22,6 +25,6 @@ class BootstrapModule(private val config: JsonObject) : ModuleBase() {
         bind<IHackerNewsCache>().to<RedisHackerNewsCache>()
         bind<GraphQLHandler>()
         bind<GraphQLHandlerWS>()
-        bind<IHackerNewsStreamService>().to<HackerNewsStreamService>().asEagerSingleton()
+//        bind<IHackerNewsStreamService>().to<HackerNewsStreamService>().asEagerSingleton()
     }
 }

@@ -29,7 +29,7 @@ class RouterFactory
             route().handler(corsHandler)
             route().handler(BodyHandler.create())
             route("/graphql").handler(graphQLHandler)
-            route("/graphqlws").handler(graphQLHandlerWS)
+            route("/subscriptions").handler(graphQLHandlerWS)
             route("/*").handler(StaticHandler.create().setCachingEnabled(false))
         }
     }
