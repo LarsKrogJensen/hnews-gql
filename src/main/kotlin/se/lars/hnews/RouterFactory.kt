@@ -14,6 +14,7 @@ class RouterFactory
 @Inject constructor(
     val graphQLHandler: GraphQLHandler,
     val subscriptionHandler: SubscriptionHandler,
+    val metricsHandler: MetricsHandler,
     val vertx: Vertx
 ) : IRouterFactory {
     override fun router(): Router {
@@ -30,6 +31,7 @@ class RouterFactory
             route().handler(BodyHandler.create())
             route("/graphql").handler(graphQLHandler)
             route("/subscriptions").handler(subscriptionHandler)
+            route("/metrics").handler(metricsHandler)
             route("/*").handler(StaticHandler.create().setCachingEnabled(false))
         }
     }

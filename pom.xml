@@ -13,7 +13,7 @@
     </prerequisites>
 
     <properties>
-        <graphql-kotlin.version>1.0.45</graphql-kotlin.version>
+        <graphql-kotlin.version>1.0-SNAPSHOT</graphql-kotlin.version>
         <vertx.version>3.4.1</vertx.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -24,12 +24,12 @@
 
     <repositories>
         <!--<repository>-->
-            <!--<snapshots>-->
-                <!--<enabled>false</enabled>-->
-            <!--</snapshots>-->
-            <!--<id>bintray-larskrogjensen-graphql-kotlin</id>-->
-            <!--<name>bintray</name>-->
-            <!--<url>http://dl.bintray.com/larskrogjensen/graphql-kotlin</url>-->
+        <!--<snapshots>-->
+        <!--<enabled>false</enabled>-->
+        <!--</snapshots>-->
+        <!--<id>bintray-larskrogjensen-graphql-kotlin</id>-->
+        <!--<name>bintray</name>-->
+        <!--<url>http://dl.bintray.com/larskrogjensen/graphql-kotlin</url>-->
         <!--</repository>-->
         <repository>
             <id>jcenter</id>
@@ -55,6 +55,11 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-config</artifactId>
+            <version>${vertx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-dropwizard-metrics</artifactId>
             <version>${vertx.version}</version>
         </dependency>
         <dependency>
@@ -140,6 +145,20 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/io.dropwizard.metrics/metrics-jvm -->
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-jvm</artifactId>
+            <version>3.1.2</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
     </dependencies>
 
 

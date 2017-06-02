@@ -11,7 +11,7 @@ class AlgoliaSearchApi @Inject constructor(
 ) : HttpClientBaseApi(vertx, "hn.algolia.com"), ISearchApi {
 
     override fun search(query: String): CompletableFuture<List<Story>> {
-        val thenApply: CompletableFuture<List<Story>> = invokeQuery<AlgoliaSearchResult>("/api/v1/search?query=$query&tags=story")
+        val thenApply: CompletableFuture<List<Story>> = invokeQuery<AlgoliaSearchResult>("/api/v1/search_by_date?query=$query&tags=story")
             .thenApply { (hits) ->
                 hits
             }

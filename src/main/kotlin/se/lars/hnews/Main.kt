@@ -9,6 +9,7 @@ import io.vertx.core.VertxOptions
 import io.vertx.core.cli.CLI
 import io.vertx.core.cli.CommandLine
 import io.vertx.core.cli.Option
+import io.vertx.ext.dropwizard.DropwizardMetricsOptions
 import io.vertx.kotlin.config.ConfigRetrieverOptions
 import io.vertx.kotlin.config.ConfigStoreOptions
 import se.lars.guice.GuiceVerticleFactory
@@ -27,11 +28,15 @@ fun main(args: Array<String>) {
     val commandLine = parseCommandLine(args)
     val configStores = loadConfigStores(commandLine)
 
-    val vertx = Vertx.vertx(VertxOptions())
+    val options = VertxOptions().apply {
+        metricsOptions = DropwizardMetricsOptions().apply {
+            isEnabled = true
+            isJmxEnabled = true
+            registryName = "hnews-registry"
+        }
+    }
+    val vertx = Vertx.vertx(options)
 
-//    vertx.fileSystem().readFile("banner.txt") {
-//        println(it.result().toString())
-//    }
 
     ConfigRetriever.create(vertx, configStores).getConfig { configLoadResult ->
         if (configLoadResult.failed()) {
@@ -45,6 +50,7 @@ fun main(args: Array<String>) {
 
             GuiceVertxDeploymentManager(vertx).apply {
                 deploy<WebServerVerticle>(wsOptions)
+                deploy<MetricsVerticle>()
             }
 
             shutdownHook { completion ->
@@ -58,7 +64,7 @@ fun main(args: Array<String>) {
 
 
 private fun loadConfigStores(commandLine: CommandLine): ConfigRetrieverOptions {
-    val config = commandLine.getOptionValue<String>("config")?: "dev.yml"
+    val config = commandLine.getOptionValue<String>("config") ?: "dev.yml"
 
     return ConfigRetrieverOptions(stores = listOf(
         ConfigStoreOptions(type = "file", format = "yaml", config = jsonObject("path" to config)),

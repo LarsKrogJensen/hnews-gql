@@ -107,8 +107,13 @@
         history.replaceState(null, null, newSearch);
     }
 
+    var subscriptionEndPoint;
+    if (window.location.host === "localhost")
+        subscriptionEndPoint = "ws://localhost:8080/subscriptions";
+    else
+        subscriptionEndPoint = "wss://hnews-gql.herokuapp.com/subscriptions";
 
-    var subscriptionsClient = new window.SubscriptionsTransportWs.SubscriptionClient("ws://localhost:8080/subscriptions", {
+    var subscriptionsClient = new window.SubscriptionsTransportWs.SubscriptionClient(subscriptionEndPoint, {
         reconnect: true
     });
     var fetcher = window.GraphiQLSubscriptionsFetcher.graphQLFetcher(subscriptionsClient, graphQLFetcher);

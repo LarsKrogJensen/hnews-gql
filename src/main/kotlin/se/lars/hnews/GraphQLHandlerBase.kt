@@ -1,5 +1,6 @@
 package se.lars.hnews
 
+import com.codahale.metrics.MetricRegistry
 import graphql.GraphQLError
 import graphql.execution.instrumentation.NoOpInstrumentation
 import graphql.newGraphQL
@@ -13,9 +14,14 @@ import se.lars.kutil.loggerFor
 import se.lars.kutil.thenOn
 import java.nio.charset.Charset
 
-abstract class GraphQLHandlerBase(val hackerNews: IHackerNewsService) : Handler<RoutingContext> {
+abstract class GraphQLHandlerBase(
+    val hackerNews: IHackerNewsService,
+    val metricRegistry: MetricRegistry
+
+) : Handler<RoutingContext> {
 
     val log = loggerFor<GraphQLHandlerBase>()
+    val requests = metricRegistry.counter("hnews.graphql.requests")!!
 
     protected fun executeGraphQL(jsonText: String, handler: (JsonObject) -> Unit): Unit {
         log.info("Query: \n" + jsonText)
@@ -48,6 +54,7 @@ abstract class GraphQLHandlerBase(val hackerNews: IHackerNewsService) : Handler<
 
         val context = RequestContext(hackerNews)
 
+        requests.inc()
         graphQL.execute(query, operation, context, variables)
             .thenOn(Vertx.currentContext())
             .thenAccept { result ->

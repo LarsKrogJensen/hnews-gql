@@ -4,6 +4,7 @@ import io.vertx.core.Vertx
 import io.vertx.core.eventbus.EventBus
 import io.vertx.core.file.FileSystem
 import io.vertx.core.shareddata.SharedData
+import io.vertx.ext.dropwizard.MetricsService
 
 /**
  * Guice [ModuleBase] for vertx and container injections.
@@ -15,5 +16,6 @@ class VertxModule(private val vertx: Vertx) : ModuleBase() {
         bind<EventBus>().toInstance(this.vertx.eventBus())
         bind<FileSystem>().toInstance(this.vertx.fileSystem())
         bind<SharedData>().toInstance(this.vertx.sharedData())
+        bind<MetricsService>().toInstance(MetricsService.create(this.vertx))
     }
 }

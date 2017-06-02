@@ -1,5 +1,6 @@
 package se.lars.hnews
 
+import com.codahale.metrics.SharedMetricRegistries
 import graphql.ExecutionResult
 import graphql.execution.instrumentation.NoOpInstrumentation
 import graphql.newGraphQL
@@ -25,6 +26,7 @@ class SubscriptionVerticle(
     private val log = loggerFor<ServerWebSocket>()
     private val subscriptions: MutableMap<Int, Disposable> = mutableMapOf()
     private var keepAliveId: Long = -1
+    private val metricsRegistry = SharedMetricRegistries.getOrCreate("hnews-metrics")
 
     override fun start(startFuture: Future<Void>) {
         vertx.eventBus().consumer<JsonObject>(wsId + "-sub") { msg: Message<JsonObject> ->
@@ -42,6 +44,8 @@ class SubscriptionVerticle(
             sendMessage("type" to "keepalive")
         }
 
+        SharedMetricRegistries.getOrCreate("vertx")
+        
         startFuture.complete()
     }
 
@@ -82,6 +86,7 @@ class SubscriptionVerticle(
 
         val context = RequestContext(hackerNews)
 
+//        metricsRegistry.
         graphQL.execute(query, null, context, variables)
             .thenOn(super.context)
             .thenAccept { result ->
