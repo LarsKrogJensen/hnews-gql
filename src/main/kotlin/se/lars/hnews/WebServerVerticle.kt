@@ -29,7 +29,7 @@ constructor(
                     certPath = "tls/server-cert.pem"
                 }
             }
-            websocketSubProtocols = "graphql-subscriptions"
+            websocketSubProtocols = "graphql-subscriptions, graphql-ws"
         }
 
 

@@ -43,9 +43,16 @@ private val commentType = newObject {
     field<List<Comment>> {
         name = "comments"
         type = GraphQLList(GraphQLTypeReference("Comment"))
+        argument {
+            name = "first"
+            description = "Show the N first number of comments"
+            type = GraphQLInt
+            defaultValue = 10
+        }
         fetcher { env ->
+            val first = env.argument<Int>("first")!!
             val commentIds = env.source<Comment>().comments ?: emptyList()
-            env.context<RequestContext>().hackerNews.comments(commentIds)
+            env.context<RequestContext>().hackerNews.comments(commentIds.take(first))
         }
     }
     field<User> {
@@ -95,14 +102,21 @@ private val storyType = newObject {
     field<List<Comment>> {
         name = "comments"
         type = GraphQLList(commentType)
+        argument {
+            name = "first"
+            description = "Show the first number of best comments"
+            type = GraphQLInt
+            defaultValue = 10
+        }
         fetcher { env ->
+            val first = env.argument<Int>("first")!!
             val commentIds = env.source<Story>().comments ?: emptyList()
-            env.context<RequestContext>().hackerNews.comments(commentIds)
+            env.context<RequestContext>().hackerNews.comments(commentIds.take(first))
         }
     }
     field<User> {
         name = "by"
-        type = GraphQLNonNull(userType)
+        type = userType
         fetcher { env ->
             env.context<RequestContext>().hackerNews.user(env.source<Story>().by)
         }
