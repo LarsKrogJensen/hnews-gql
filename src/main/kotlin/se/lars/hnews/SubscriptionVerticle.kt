@@ -100,23 +100,21 @@ class SubscriptionVerticle(
 
         val context = RequestContext(hackerNews)
 
-//        metricsRegistry.
         graphQL.execute(query, null, context, variables)
             .thenOn(super.context)
             .thenAccept { result ->
                 if (result.succeeded()) {
-
-//                    sendMessage("type" to "subscription_success",
-//                                "id" to subscriptionId)
                     val data = result.data<Map<String, Flux<ExecutionResult>>>()
 
                     val disposables = data.map { (field: String, flux: Flux<ExecutionResult>) ->
                         flux.subscribe(
                             { data -> onData(subscriptionId, field, data.data<Any>()) },
-                            { ex -> sendMessage("type" to GQL_ERROR, "id" to subscriptionId) },
-                            {
-                                sendMessage("type" to GQL_COMPLETE, "id" to subscriptionId,
+                            { ex ->
+                                sendMessage("type" to GQL_ERROR, "id" to subscriptionId,
                                             "payload" to jsonObject("errors" to "Internal Server Error"))
+                            },
+                            {
+                                sendMessage("type" to GQL_COMPLETE, "id" to subscriptionId)
                             }
                         )
                     }
