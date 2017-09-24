@@ -117,7 +117,10 @@ constructor(
         value?.let {
             val writeValueAsString = mapper.writeValueAsString(value)
             redis.set(key, writeValueAsString) {
-                log.info("Redis set<$key> with result ${it.succeeded()} value: $writeValueAsString")
+                if (it.succeeded())
+                    log.info("Redis set<$key> value: $writeValueAsString")
+                else
+                    log.error("Redis set<$key> failed with cause ${it.cause().message}")
             }
         }
     }

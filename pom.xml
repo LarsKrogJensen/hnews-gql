@@ -17,7 +17,7 @@
         <vertx.version>3.4.1</vertx.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <kotlin.version>1.1.2-4</kotlin.version>
+        <kotlin.version>1.1.50</kotlin.version>
         <jackson.version>2.7.4</jackson.version>
         <encoding>UTF-8</encoding>
     </properties>
@@ -121,6 +121,16 @@
             <groupId>com.graphql-kotlin</groupId>
             <artifactId>graphql-kotlin</artifactId>
             <version>${graphql-kotlin.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>kotlin-stdlib-jre8</artifactId>
+                    <groupId>org.jetbrains.kotlin</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>kotlin-reflect</artifactId>
+                    <groupId>org.jetbrains.kotlin</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

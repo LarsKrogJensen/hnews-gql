@@ -53,7 +53,7 @@ class SubscriptionVerticle(
             }
         }
 
-        vertx.setPeriodic(30_000L) {
+        vertx.setPeriodic(5_000L) {
             sendMessage("type" to GQL_CONNECTION_KEEP_ALIVE)
         }
 
@@ -72,6 +72,7 @@ class SubscriptionVerticle(
     private fun handleInit() {
         log.info("handleInit")
         sendMessage("type" to GQL_CONNECTION_ACK)
+        sendMessage("type" to GQL_CONNECTION_KEEP_ALIVE)
     }
 
     private fun handleSubscriptionEnd(input: JsonObject) {
