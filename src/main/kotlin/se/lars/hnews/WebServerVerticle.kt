@@ -4,15 +4,19 @@ import io.vertx.core.AbstractVerticle
 import io.vertx.core.Future
 import io.vertx.core.http.HttpServer
 import io.vertx.core.http.HttpServerOptions
+import io.vertx.core.http.ServerWebSocket
+import io.vertx.core.json.JsonObject
 import io.vertx.core.net.PemKeyCertOptions
+import se.lars.hnews.services.HackerNewsService
 import se.lars.kutil.loggerFor
 import javax.inject.Inject
 
 class WebServerVerticle
 @Inject
 constructor(
-        private val serverOptions: IServerOptions,
-        private val routerFactory: IRouterFactory
+    private val serverOptions: IServerOptions,
+    private val routerFactory: IRouterFactory,
+    private val hackerNews: HackerNewsService
 ) : AbstractVerticle() {
 
     private val log = loggerFor<WebServerVerticle>()
@@ -34,19 +38,20 @@ constructor(
 
 
         httpServer = vertx.createHttpServer(options)
-                .requestHandler { routerFactory.router().accept(it) }
-                .listen(serverOptions.httpPort) {
-                    when (it.succeeded()) {
-                        true  -> {
-                            log.info("Http service started. on port " + it.result().actualPort())
-                            startFuture.succeeded()
-                        }
-                        false -> {
-                            log.error("Http service failed to started.")
-                            startFuture.fail(it.cause())
-                        }
+            .requestHandler { routerFactory.router().accept(it) }
+            .websocketHandler(this::handleWebSocketRequest)
+            .listen(serverOptions.httpPort) {
+                when (it.succeeded()) {
+                    true  -> {
+                        log.info("Http service started. on port " + it.result().actualPort())
+                        startFuture.succeeded()
+                    }
+                    false -> {
+                        log.error("Http service failed to started.")
+                        startFuture.fail(it.cause())
                     }
                 }
+            }
     }
 
     override fun stop(stopFuture: Future<Void>) {
@@ -56,5 +61,15 @@ constructor(
             stopFuture.complete()
         }
 
+    }
+
+    private fun handleWebSocketRequest(ws: ServerWebSocket) {
+        vertx.deployVerticle(SubscriptionVerticle(ws.textHandlerID(), hackerNews)) { deployResult ->
+            val deploymentId = deployResult.result()
+            val eventBus = vertx.eventBus()
+            ws.textMessageHandler { msg -> eventBus.send(ws.textHandlerID() + "-sub", JsonObject(msg)) }
+            ws.closeHandler { ignored -> vertx.undeploy(deploymentId) }
+            ws.exceptionHandler { ex -> vertx.undeploy(deploymentId) }
+        }
     }
 }

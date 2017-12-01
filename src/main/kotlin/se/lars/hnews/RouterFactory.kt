@@ -20,7 +20,7 @@ class RouterFactory
     override fun router(): Router {
         // configure cross domain access
         val corsHandler = with(CorsHandler.create("*")) {
-            allowCredentials(true)
+//            allowCredentials(true)
             allowedMethod(HttpMethod.POST)
             allowedHeaders(setOf("content-type", "authorization"))
         }

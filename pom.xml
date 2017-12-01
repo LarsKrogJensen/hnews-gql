@@ -14,11 +14,11 @@
 
     <properties>
         <graphql-kotlin.version>1.0-SNAPSHOT</graphql-kotlin.version>
-        <vertx.version>3.4.1</vertx.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <kotlin.version>1.1.50</kotlin.version>
-        <jackson.version>2.7.4</jackson.version>
+        <vertx.version>3.5.0</vertx.version>
+        <maven.compiler.source>9</maven.compiler.source>
+        <maven.compiler.target>9</maven.compiler.target>
+        <kotlin.version>1.1.51</kotlin.version>
+        <jackson.version>2.9.0</jackson.version>
         <encoding>UTF-8</encoding>
     </properties>
 
@@ -78,11 +78,6 @@
             <artifactId>vertx-redis-client</artifactId>
             <version>${vertx.version}</version>
         </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-tcnative-boringssl-static</artifactId>
-            <version>1.1.33.Fork26</version>
-        </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -100,7 +95,6 @@
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-kotlin</artifactId>
             <version>${jackson.version}</version>
-            <!--<version>2.9.0.pr1</version>-->
             <exclusions>
                 <exclusion>
                     <artifactId>kotlin-stdlib</artifactId>
@@ -109,10 +103,6 @@
                 <exclusion>
                     <artifactId>kotlin-reflect</artifactId>
                     <groupId>org.jetbrains.kotlin</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jackson-annotations</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
