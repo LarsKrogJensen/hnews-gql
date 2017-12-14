@@ -17,7 +17,7 @@
         <vertx.version>3.5.0</vertx.version>
         <maven.compiler.source>9</maven.compiler.source>
         <maven.compiler.target>9</maven.compiler.target>
-        <kotlin.version>1.1.51</kotlin.version>
+        <kotlin.version>1.2.10</kotlin.version>
         <jackson.version>2.9.0</jackson.version>
         <encoding>UTF-8</encoding>
     </properties>

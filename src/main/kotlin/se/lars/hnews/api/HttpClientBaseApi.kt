@@ -26,7 +26,6 @@ open class HttpClientBaseApi
             protocolVersion = HttpVersion.HTTP_2
             isSsl = true
             isUseAlpn = true
-            isTrustAll = true
             defaultHost = baseUrl
             defaultPort = 443
             logActivity = true
@@ -47,11 +46,12 @@ open class HttpClientBaseApi
             .exceptionHandler { ex -> future.completeExceptionally(ex) }
             .handler { response ->
                 if (response.statusCode() == HttpResponseStatus.OK.code()) {
+                    log.info("Protocol version: ${response.version()}")
                     response.bodyHandler { buffer ->
                         try {
                             val typeObj = mapper.readValue(buffer.bytes, T::class.java)
                             future.complete(typeObj)
-                        } catch(e: Exception) {
+                        } catch (e: Exception) {
                             log.error("Failed to invoke ${formatUrl(query)}", e)
                             future.completeExceptionally(e)
                         }
